@@ -1,5 +1,5 @@
-nutclient-go
-============
+nutclient for Golang
+====================
 
 ## About
 
