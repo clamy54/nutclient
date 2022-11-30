@@ -9,7 +9,7 @@ Network UPS Tools (NUT) client module for Go.
 
 View inside example directory.
 
-## Functions (depends on nut server configuration and ups capabilities)
+## Functions (depends on nut server configuration and ups capabilities)
 
 * Dial(address)
 * StartTLS(tlsconfig) 
