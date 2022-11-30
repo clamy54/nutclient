@@ -9,6 +9,41 @@ Network UPS Tools (NUT) client module for Go.
 
 View inside example directory.
 
+## Functions (depends on nut server configuration and ups capabilities)
+
+* Dial(address)
+* StartTLS(tlsconfig) 
+* Auth("login","password")
+* Login("upsname")
+* Close()
+* GetUpsModel()
+* Logout()
+* IsOnline()
+* IsOnBattery()
+* IsLowBattery()
+* BatteryCharge()
+* BatteryChargeLow()
+* BatteryChargeWarning()
+* BatteryChargeRestart()
+* BatteryRuntime()
+* BatteryRuntimeLow()
+* BatteryRuntimeRestart()
+* GetServerInfo()
+* GetServerVersion()
+* UpsLoad()
+* UpsTemperature()
+* UpsApparentPower()
+* UpsActivePower()
+* InputVoltage()
+* InputCurrent()
+* OutputVoltage()
+* OutputCurrent()
+* OutputFrequency()
+* InputFrequency()
+* GetUpsModel()
+* GetUpsSerial()
+
+
 
 ## License
 
