@@ -42,6 +42,9 @@ View inside example directory.
 * InputFrequency()
 * GetUpsModel()
 * GetUpsSerial()
+* GetServerUpsList()
+* GetUpsVars()
+* GetData(varname)
 
 
 
