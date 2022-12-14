@@ -66,7 +66,7 @@ func (c *Client) cmd(format string) (string, error) {
 // Get a specific data from current ups
 func (c *Client) GetData(format string) (string, error) {
 
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return "", errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -95,6 +95,47 @@ func (c *Client) GetData(format string) (string, error) {
 	} else {
 		return "", errors.New(response)
 	}
+}
+
+// Get a multiline data response
+func (c *Client) getmultilinesdata(command string) ([]string, error) {
+
+	var retslice []string
+	if len(command) == 0 {
+		return nil, errors.New("Variable cannot be empty")
+	}
+
+	err := c.Text.PrintfLine("%s", command)
+
+	if err != nil {
+		return nil, err
+	}
+	response, err := c.Text.ReadLine()
+
+	if err != nil {
+		return nil, err
+	}
+	retcode, _, _ := strings.Cut(response, " ")
+
+	if strings.EqualFold(retcode, "BEGIN") {
+		exitloop := false
+		for !exitloop {
+			response, err := c.Text.ReadLine()
+
+			if err != nil {
+				return nil, err
+			}
+			retcode, _, _ := strings.Cut(response, " ")
+			if strings.EqualFold(retcode, "END") {
+				exitloop = true
+			} else {
+				retslice = append(retslice, response)
+			}
+		}
+	} else {
+		return nil, errors.New(response)
+	}
+	return retslice, nil
 }
 
 // StartTLS sends the STARTTLS command and encrypts all further communication.
@@ -151,7 +192,7 @@ func (c *Client) Logout() error {
 // Return true if current ups is online
 func (c *Client) IsOnline() (bool, error) {
 	online := false
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return false, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -162,7 +203,7 @@ func (c *Client) IsOnline() (bool, error) {
 	}
 	firstarg, _, _ := strings.Cut(result, " ")
 
-	if len(firstarg) >= 2 {
+	if len([]rune(firstarg)) >= 2 {
 
 		if (strings.ToUpper(firstarg) == "OL") || (strings.ToUpper(firstarg) == "BYPASS") {
 			online = true
@@ -176,7 +217,7 @@ func (c *Client) IsOnline() (bool, error) {
 // Return true if current ups is on battery
 func (c *Client) IsOnBattery() (bool, error) {
 	onbattery := false
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return false, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -185,7 +226,7 @@ func (c *Client) IsOnBattery() (bool, error) {
 		return false, errors.New("Error getting current ups status")
 	}
 
-	if len(result) >= 2 {
+	if len([]rune(result)) >= 2 {
 		if (strings.ToUpper(result[0:2]) == "OB") || (strings.ToUpper(result[0:2]) == "LB") {
 			onbattery = true
 		}
@@ -198,7 +239,7 @@ func (c *Client) IsOnBattery() (bool, error) {
 // Return true if current ups status is low battery
 func (c *Client) IsLowBattery() (bool, error) {
 	lowbattery := false
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return false, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -207,7 +248,7 @@ func (c *Client) IsLowBattery() (bool, error) {
 		return false, errors.New("Error getting current ups status")
 	}
 
-	if len(result) >= 2 {
+	if len([]rune(result)) >= 2 {
 		if strings.ToUpper(result[0:2]) == "LB" {
 			lowbattery = true
 		}
@@ -220,7 +261,7 @@ func (c *Client) IsLowBattery() (bool, error) {
 // Return Battery Charge
 func (c *Client) BatteryCharge() (int, error) {
 	charge := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return charge, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -241,7 +282,7 @@ func (c *Client) BatteryCharge() (int, error) {
 // Return Battery Charge Low value
 func (c *Client) BatteryChargeLow() (int, error) {
 	charge := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return charge, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -262,7 +303,7 @@ func (c *Client) BatteryChargeLow() (int, error) {
 // Return Battery Charge Warning value
 func (c *Client) BatteryChargeWarning() (int, error) {
 	charge := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return charge, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -283,7 +324,7 @@ func (c *Client) BatteryChargeWarning() (int, error) {
 // Return Battery Charge Restart value
 func (c *Client) BatteryChargeRestart() (int, error) {
 	charge := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return charge, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -304,7 +345,7 @@ func (c *Client) BatteryChargeRestart() (int, error) {
 // Return Battery runtime (seconds)
 func (c *Client) BatteryRuntime() (int, error) {
 	runtime := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return runtime, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -325,7 +366,7 @@ func (c *Client) BatteryRuntime() (int, error) {
 // Return Battery runtime  low (seconds)
 func (c *Client) BatteryRuntimeLow() (int, error) {
 	runtime := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return runtime, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -346,7 +387,7 @@ func (c *Client) BatteryRuntimeLow() (int, error) {
 // Return Battery runtime restart (seconds)
 func (c *Client) BatteryRuntimeRestart() (int, error) {
 	runtime := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return runtime, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -367,9 +408,6 @@ func (c *Client) BatteryRuntimeRestart() (int, error) {
 // Return Server Info
 func (c *Client) GetServerInfo() (string, error) {
 	info := ""
-	if len(c.upsName) == 0 {
-		return info, errors.New("No UPS defined, use LOGIN first")
-	}
 
 	result, err := c.GetData("server.info")
 	if err != nil {
@@ -380,12 +418,9 @@ func (c *Client) GetServerInfo() (string, error) {
 	return info, nil
 }
 
-// Return Server Info
+// Return Server Version
 func (c *Client) GetServerVersion() (string, error) {
 	info := ""
-	if len(c.upsName) == 0 {
-		return info, errors.New("No UPS defined, use LOGIN first")
-	}
 
 	result, err := c.GetData("server.version")
 	if err != nil {
@@ -396,10 +431,60 @@ func (c *Client) GetServerVersion() (string, error) {
 	return info, nil
 }
 
+// Return configured UPS list
+func (c *Client) GetServerUpsList() ([]string, error) {
+	var retslice []string
+
+	result, err := c.getmultilinesdata("LIST UPS")
+
+	if (err != nil) || (len(result) == 0) {
+		return nil, errors.New("Error getting ups list")
+	}
+
+	for _, value := range result {
+		retcode, _, _ := strings.Cut(value, " ")
+
+		if strings.EqualFold(retcode, "UPS") {
+			argsstr := strings.Fields(value)
+			if len(argsstr) > 0 {
+				retslice = append(retslice, argsstr[1])
+			}
+		}
+	}
+	return retslice, nil
+}
+
+// Return ups vars avaible
+func (c *Client) GetUpsVars() ([]string, error) {
+	var retslice []string
+
+	if len([]rune(c.upsName)) == 0 {
+		return nil, errors.New("No UPS defined, use LOGIN first")
+	}
+
+	result, err := c.getmultilinesdata("LIST VAR " + c.upsName)
+
+	if (err != nil) || (len(result) == 0) {
+		return nil, errors.New("Error getting ups list")
+	}
+
+	for _, value := range result {
+		retcode, _, _ := strings.Cut(value, " ")
+
+		if strings.EqualFold(retcode, "VAR") {
+			argsstr := strings.Fields(value)
+			if len(argsstr) > 3 {
+				retslice = append(retslice, argsstr[2])
+			}
+		}
+	}
+	return retslice, nil
+}
+
 // Return ups load (percent)
 func (c *Client) UpsLoad() (int, error) {
 	upsload := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return upsload, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -420,7 +505,7 @@ func (c *Client) UpsLoad() (int, error) {
 // Return ups load (degrees C)
 func (c *Client) UpsTemperature() (int, error) {
 	upstemperature := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return upstemperature, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -441,7 +526,7 @@ func (c *Client) UpsTemperature() (int, error) {
 // Return current apparent ups power (VA)
 func (c *Client) UpsApparentPower() (int, error) {
 	upspower := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return upspower, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -462,7 +547,7 @@ func (c *Client) UpsApparentPower() (int, error) {
 // Return current active ups power (W)
 func (c *Client) UpsActivePower() (int, error) {
 	upspower := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return upspower, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -483,7 +568,7 @@ func (c *Client) UpsActivePower() (int, error) {
 // Return Input Voltage (V)
 func (c *Client) InputVoltage() (int, error) {
 	voltage := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return voltage, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -504,7 +589,7 @@ func (c *Client) InputVoltage() (int, error) {
 // Return Input Current (A)
 func (c *Client) InputCurrent() (int, error) {
 	courant := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return courant, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -525,7 +610,7 @@ func (c *Client) InputCurrent() (int, error) {
 // Return Output Voltage (V)
 func (c *Client) OutputVoltage() (int, error) {
 	voltage := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return voltage, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -546,7 +631,7 @@ func (c *Client) OutputVoltage() (int, error) {
 // Return Output Current (A)
 func (c *Client) OutputCurrent() (int, error) {
 	courant := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return courant, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -567,7 +652,7 @@ func (c *Client) OutputCurrent() (int, error) {
 // Return Output Frequency (Hz)
 func (c *Client) OutputFrequency() (int, error) {
 	frequency := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return frequency, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -588,7 +673,7 @@ func (c *Client) OutputFrequency() (int, error) {
 // Return Input Frequency (Hz)
 func (c *Client) InputFrequency() (int, error) {
 	frequency := -1
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return frequency, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -609,7 +694,7 @@ func (c *Client) InputFrequency() (int, error) {
 // Return Ups Model
 func (c *Client) GetUpsModel() (string, error) {
 	info := ""
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return info, errors.New("No UPS defined, use LOGIN first")
 	}
 
@@ -625,7 +710,7 @@ func (c *Client) GetUpsModel() (string, error) {
 // Return Ups Serial Number
 func (c *Client) GetUpsSerial() (string, error) {
 	info := ""
-	if len(c.upsName) == 0 {
+	if len([]rune(c.upsName)) == 0 {
 		return info, errors.New("No UPS defined, use LOGIN first")
 	}
 
