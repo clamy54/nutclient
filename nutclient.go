@@ -201,11 +201,10 @@ func (c *Client) IsOnline() (bool, error) {
 	if err != nil {
 		return false, errors.New("Error getting current ups status")
 	}
-	firstarg, _, _ := strings.Cut(result, " ")
 
-	if len([]rune(firstarg)) >= 2 {
+	if len(result) > 0 {
 
-		if (strings.ToUpper(firstarg) == "OL") || (strings.ToUpper(firstarg) == "BYPASS") {
+		if (strings.Contains(strings.ToUpper(result), "OL")) || (strings.Contains(strings.ToUpper(result), "BYPASS")) {
 			online = true
 		}
 	} else {
@@ -226,8 +225,8 @@ func (c *Client) IsOnBattery() (bool, error) {
 		return false, errors.New("Error getting current ups status")
 	}
 
-	if len([]rune(result)) >= 2 {
-		if (strings.ToUpper(result[0:2]) == "OB") || (strings.ToUpper(result[0:2]) == "LB") {
+	if len(result) > 0 {
+		if (strings.Contains(strings.ToUpper(result), "OB")) || (strings.Contains(strings.ToUpper(result), "LB")) {
 			onbattery = true
 		}
 	} else {
